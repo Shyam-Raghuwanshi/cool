@@ -159,9 +159,9 @@ jobs:
 
     - name: Debug Environment
       run: |
-        echo "Debugging environment..."
-        env
-        freebsd-version || exit 1
+          echo "Debugging environment..."
+          env
+          freebsd-version || exit 1
 
     - name: Build
       id: build
@@ -198,12 +198,13 @@ jobs:
             rm -rf node_modules
             rm -rf target
             rm -rf .yarn/cache
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: bindings-freebsd
-          path: ${{ env.APP_NAME }}.*.node
-          if-no-files-found: error
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: bindings-freebsd
+        path: ${{ env.APP_NAME }}.*.node
+        if-no-files-found: error
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
     needs:

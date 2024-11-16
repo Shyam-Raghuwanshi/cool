@@ -180,54 +180,46 @@ jobs:
           run: |
             # Update package repository first
             sudo pkg update -f
-            
-            # Install packages with error handling
-            for pkg in curl node libnghttp2 npm; do
-              echo "Installing $pkg..."
-              sudo pkg install -y -f $pkg || exit 1
-            done
-            
-            # Install yarn with error handling
-            echo "Installing yarn globally..."
-            sudo npm install -g yarn --ignore-scripts || exit 1
-            
-            # Install Rust with error handling
-            echo "Installing Rust..."
-            curl https://sh.rustup.rs -sSf --output rustup.sh || exit 1
-            sh rustup.sh -y --profile minimal --default-toolchain stable || exit 1
-            source "$HOME/.cargo/env"
-            
-            # Print versions and system info
-            echo "~~~~ System Information ~~~~"
-            echo "~~~~ rustc --version ~~~~"
-            rustc --version
-            echo "~~~~ node -v ~~~~"
-            node -v
-            echo "~~~~ yarn --version ~~~~"
-            yarn --version
-            echo "~~~~ Current Directory ~~~~"
-            pwd
-            ls -lah
-            echo "~~~~ User ~~~~"
-            whoami
-            echo "~~~~ Environment ~~~~"
-            env
-            echo "~~~~ FreeBSD Version ~~~~"
-            freebsd-version
-            
-            # Main build commands with error handling
-            echo "~~~~ Installing Dependencies ~~~~"
-            yarn install || exit 1
-            echo "~~~~ Building ~~~~"
-            yarn build || exit 1
-            echo "~~~~ Testing ~~~~"
-            yarn test || exit 1
-            
-            # Cleanup
-            echo "~~~~ Cleanup ~~~~"
-            rm -rf node_modules
-            rm -rf target
-            rm -rf .yarn/cache
+            build-freebsd:
+    runs-on: macos-13
+    name: Build FreeBSD
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        id: build
+        uses: cross-platform-actions/action@v0.24.0
+        env:
+          DEBUG: napi:*
+          RUSTUP_IO_THREADS: 1
+        with:
+          operating_system: freebsd
+          version: '13.2'
+          memory: 8G
+          cpu_count: 3
+          shell: bash
+          run: |
+              sudo pkg install -y -f curl node libnghttp2 npm
+              sudo npm install -g yarn --ignore-scripts
+              curl https://sh.rustup.rs -sSf --output rustup.sh
+              sh rustup.sh -y --profile minimal --default-toolchain stable
+              source "$HOME/.cargo/env"
+              echo "~~~~ rustc --version ~~~~"
+              rustc --version
+              echo "~~~~ node -v ~~~~"
+              node -v
+              echo "~~~~ yarn --version ~~~~"
+              yarn --version
+              pwd
+              ls -lah
+              whoami
+              env
+              freebsd-version
+              yarn install
+              yarn build
+              yarn test
+              rm -rf node_modules
+              rm -rf target
+              rm -rf .yarn/cache
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

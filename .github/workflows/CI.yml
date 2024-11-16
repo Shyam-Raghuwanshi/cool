@@ -151,6 +151,10 @@ jobs:
     name: Build FreeBSD
     steps:
       - uses: actions/checkout@v4
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Build
         id: build
         uses: cross-platform-actions/action@v0.24.0

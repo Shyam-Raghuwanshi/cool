@@ -168,6 +168,12 @@ jobs:
           cpu_count: 3
           environment_variables: 'DEBUG RUSTUP_IO_THREADS'
           shell: bash
+          prepare: |
+              mkdir -p ~/.ssh
+              echo "Host *" > ~/.ssh/config
+              echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+              echo "  UserKnownHostsFile /dev/null" >> ~/.ssh/config
+              chmod 600 ~/.ssh/config
           run: |
               # Ensure we're not in any mounted directories
               cd $HOME

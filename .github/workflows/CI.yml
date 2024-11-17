@@ -477,7 +477,7 @@ jobs:
             npm publish --tag next --access public
           else
             echo "Not a release, skipping publish"
-          fi
+          fi 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
